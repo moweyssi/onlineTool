@@ -51,7 +51,7 @@ input_data = pd.DataFrame({
 
 # Display the editable input DataFrame
 st.subheader("Input Marketing Spend for Each Channel (Rows) and Month (Columns)")
-input_df = st.experimental_data_editor(input_data, use_container_width=True)
+input_df = st.data_editor(input_data, use_container_width=True)
 
 # Generate predictions when inputs are changed
 if st.button('Generate Predictions'):
