@@ -26,18 +26,18 @@ channels = ['PaidSocial', 'PaidSearch', 'DirectMail', 'Undirected']
 
 # Function to make predictions based on the input DataFrame
 def make_predictions(input_df):
-    # Transpose the input DataFrame to get the correct shape (features should be columns, not rows)
-    input_features = input_df.T.values  # Transposing to get (7 months, 4 channels)
+    # Ensure input data is in the correct shape
+    input_features = input_df.T.values  # Shape (months, channels), needs to be (channels, months)
     
-    # Predict using both models
-    total_contact_preds = model_total_contact.predict(input_features.T)  # Transpose to align features
-    web_user_preds = model_web_users.predict(input_features.T)  # Transpose to align features
+    # Predict using both models for each month (each row in input_features)
+    total_contact_preds = model_total_contact.predict(input_features)  # One prediction per month
+    web_user_preds = model_web_users.predict(input_features)  # One prediction per month
     
     # Create a DataFrame for predictions with months as columns
     predictions = pd.DataFrame({
-        'TotalContact': np.round(total_contact_preds, 2),
-        'WebUsers': np.round(web_user_preds, 2)
-    }, index=months).T  # Transpose to get predictions as rows and months as columns
+        month: [np.round(total_contact_preds[i], 2), np.round(web_user_preds[i], 2)] 
+        for i, month in enumerate(months)
+    }, index=['TotalContact', 'WebUsers'])
     
     return predictions
 
@@ -51,7 +51,7 @@ input_data = pd.DataFrame({
 
 # Display the editable input DataFrame
 st.subheader("Input Marketing Spend for Each Channel (Rows) and Month (Columns)")
-input_df = st.data_editor(input_data, use_container_width=True)
+input_df = st.experimental_data_editor(input_data, use_container_width=True)
 
 # Generate predictions when inputs are changed
 if st.button('Generate Predictions'):
