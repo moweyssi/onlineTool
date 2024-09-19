@@ -6,7 +6,7 @@ import plotly.graph_objects as go
 from sklearn.ensemble import RandomForestRegressor
 
 # Load the trained RandomForest model
-with open("rfr_newmodel.pkl","wb") as file:
+with open("rfr_newmodel.pkl","r") as file:
     model = pickle.load(file)
 
 
