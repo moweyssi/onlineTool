@@ -101,7 +101,7 @@ if st.button('Generate Predictions'):
     
     # Display the output as a non-editable DataFrame
     st.subheader("Predicted WebUsers and Contacts for Each Month")
-    st.dataframe(predictions, use_container_width=True)
+    st.dataframe(predictions.T, use_container_width=True)
 
 # Feature importance visualization (if your RandomForest model supports it)
 if hasattr(model, 'feature_importances_'):
