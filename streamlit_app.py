@@ -81,7 +81,7 @@ input_df = st.data_editor(input_data, use_container_width=True)
 total_df = pd.DataFrame({
     "Total":input_data.sum(numeric_only=True, axis=0)
 })
-st.dataframe(total_df)
+st.dataframe(total_df.T)
 # Generate predictions when inputs are changed
 if st.button('Generate Predictions'):
     # Transpose the input to align with model's expected input format
