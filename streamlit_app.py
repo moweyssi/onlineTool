@@ -42,8 +42,8 @@ def make_predictions(df):
             # Check if the previous row exists (avoid KeyError)
             if i - 1 >= 0:
                 # Fill in 'MonthBefore' data with the predictions from the previous row
-                df.loc[i, 'WebUsersMonthBefore'] = predictions[-1][0]
-                df.loc[i, 'ContactsMonthBefore'] = predictions[-1][1]
+                df.loc[i, 'WebUsersMonthBefore'] = predictions[i-1][0]
+                df.loc[i, 'ContactsMonthBefore'] = predictions[i-1][1]
 
                 # Ensure columns are being accessed safely
                 for col in ['PaidSocial', 'PaidSearch', 'DirectMail', 'Radio', 'OutOfHome', 'Print']:
