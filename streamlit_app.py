@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import xgboost as xgb
+import plotly.graph_objects as go
 
 # Load the trained XGBoost model
 model = xgb.Booster({'nthread': 4})  # init model
@@ -98,3 +99,54 @@ if st.button('Generate Predictions'):
     # Display the output as a non-editable DataFrame
     st.subheader("Predicted TotalContact and WebUsers (Rows) for Each Month (Columns)")
     st.dataframe(predictions, use_container_width=True)
+
+
+
+
+# Assuming the feature importances are calculated like this
+xg_importances = model.get_score(importance_type='weight')  # Get feature importances from XGBoost
+
+# Get feature names
+feature_names = ['MonthsRunning', 'MonthNumber', 'WebUsersMay', 'WebUsersJune', 'WebUsersJuly', 
+                 'ContactMay', 'ContactJune', 'ContactJuly', 'PaidSocial', 'PaidSearch', 
+                 'DirectMail', 'Undirected(radio_outofhome_print)']
+
+# Convert to DataFrame for easier manipulation
+feature_importance_df = pd.DataFrame({
+    'Feature': feature_names,
+    'Importance': [xg_importances.get(f, 0) for f in feature_names]  # Using 0 if feature is not in the importance dict
+})
+
+# Sort feature importances by descending order
+feature_importance_df = feature_importance_df.sort_values(by='Importance', ascending=False)
+
+# Add explanation about feature importances
+with st.expander("See explanation"):
+    st.write("""
+        **Feature Importance Explanation:**
+
+        Feature importance reflects how much each feature contributed to the model's predictions. 
+        Features with higher importance values have more influence on the predictions made by the model.
+
+        The bar chart below shows the relative importance of each feature in the XGBoost model. 
+        These values can help identify the key factors driving the model's behavior.
+    """)
+
+    # Create a Plotly bar chart for feature importances
+    fig = go.Figure(data=[go.Bar(
+        x=feature_importance_df['Feature'],
+        y=feature_importance_df['Importance'],
+        marker_color='indianred'
+    )])
+
+    fig.update_layout(
+        title="Feature Importances",
+        xaxis_title="Features",
+        yaxis_title="Importance",
+        xaxis_tickangle=-45,
+        template="plotly_white",
+        height=600
+    )
+
+    # Display the plot
+    st.plotly_chart(fig, use_container_width=True)
