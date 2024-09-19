@@ -32,6 +32,8 @@ def make_predictions(df):
     
     for i in range(len(df)):
         st.write(f"Processing row: {i}")  # Debug statement
+        st.write("Current DataFrame before prediction:")
+        st.write(df)  # Print the current DataFrame for debugging
         
         if i == 0:
             # First row is already fully filled, just predict
@@ -39,30 +41,27 @@ def make_predictions(df):
             prediction = model.predict(df.iloc[[i]])[0]
             predictions.append(prediction)
         else:
-            # Check if the previous row exists (avoid KeyError)
-            if i - 1 >= 0:
-                # Fill in 'MonthBefore' data with the predictions from the previous row
-                st.write(predictions[-1][0])
-                df.loc[i-1, 'ContactsMonthBefore'] = predictions[-1][0]
-                df.loc[i-1, 'WebUsersMonthBefore'] = predictions[-1][1]
+            # Fill in 'MonthBefore' data with the predictions from the previous row
+            if predictions:  # Ensure there's a previous prediction to use
+                df.loc[i, 'WebUsersMonthBefore'] = predictions[-1][0]
+                df.loc[i, 'ContactsMonthBefore'] = predictions[-1][1]
 
-                # Ensure columns are being accessed safely
-                for col in ['PaidSocial', 'PaidSearch', 'DirectMail', 'Radio', 'OutOfHome', 'Print']:
-                    month_col = f'{col}MonthBefore'
-                    if month_col in df.columns:
-                        if i - 1 in df.index:  # Ensure the index exists
-                            df.loc[i, month_col] = df.loc[i - 1, col]
-                            st.write(df.iloc[[i]])
-                        else:
-                            st.error(f"Index {i - 1} does not exist in DataFrame")
+            # Ensure columns are being accessed safely
+            for col in ['PaidSocial', 'PaidSearch', 'DirectMail', 'Radio', 'OutOfHome', 'Print']:
+                month_col = f'{col}MonthBefore'
+                if month_col in df.columns:
+                    if i - 1 in df.index:  # Ensure the previous index exists
+                        df.loc[i, month_col] = df.loc[i - 1, col]
                     else:
-                        st.error(f"Column {month_col} does not exist in DataFrame")
+                        st.error(f"Index {i - 1} does not exist in DataFrame")
+                else:
+                    st.error(f"Column {month_col} does not exist in DataFrame")
             
-                # Make prediction for the current row
-                
-                prediction = model.predict(df.iloc[[i]])[0]
-        
-                predictions.append(prediction)
+            # Make prediction for the current row
+            st.write("DataFrame before prediction:")
+            st.write(df.iloc[[i]])
+            prediction = model.predict(df.iloc[[i]])[0]
+            predictions.append(prediction)
 
     # Convert predictions into a DataFrame with columns for 'WebUsers' and 'Contacts'
     predictions_df = pd.DataFrame(predictions, columns=['WebUsers', 'Contacts'], index=df.index)
