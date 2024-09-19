@@ -4,7 +4,7 @@ import numpy as np
 import pickle
 import plotly.graph_objects as go
 from sklearn.ensemble import RandomForestRegressor
-
+st.set_page_config(layout="wide")
 # Load the trained RandomForest model
 with open("rfr_newmodel.pkl", "rb") as file:
     model = pickle.load(file)
