@@ -10,8 +10,8 @@ model.load_model('R2_0.32_MAE_800.json')  # load the pre-trained model
 # Define months of interest
 months = ['September', 'October', 'November', 'December', 'January', 'February', 'March']
 
-# Define marketing channels
-channels = ['PaidSocial', 'PaidSearch', 'DirectMail', 'Undirected(radio_outofhome_print)']
+# Define marketing channels (renaming "Undirected" for display)
+channels = ['PaidSocial', 'PaidSearch', 'DirectMail', 'Undirected (radio, out-of-home, print)']
 
 # Pre-defined values for "under-the-hood" columns
 web_users_may = 1000
@@ -23,7 +23,7 @@ contact_july = 55
 
 # The model needs columns in the following order: 
 # ['MonthsRunning', 'MonthNumber', 'WebUsersMay', 'WebUsersJune', 'WebUsersJuly', 'ContactMay', 
-#  'ContactJune', 'ContactJuly', 'PaidSocial', 'PaidSearch', 'DirectMail', 'Undirected(radio_outofhome_print)']
+#  'ContactJune', 'ContactJuly', 'PaidSocial', 'PaidSearch', 'DirectMail', 'Undirected']
 
 # Function to make predictions based on the input DataFrame
 def make_predictions(input_df):
@@ -42,7 +42,10 @@ def make_predictions(input_df):
     # Reorder columns to match the model's requirements
     columns_order = ['MonthsRunning', 'MonthNumber', 'WebUsersMay', 'WebUsersJune', 'WebUsersJuly', 
                      'ContactMay', 'ContactJune', 'ContactJuly', 'PaidSocial', 'PaidSearch', 
-                     'DirectMail', 'Undirected(radio_outofhome_print)']
+                     'DirectMail', 'Undirected']
+    
+    # Rename "Undirected (radio, out-of-home, print)" back to "Undirected" for the model input
+    input_df.rename(columns={'Undirected (radio, out-of-home, print)': 'Undirected'}, inplace=True)
     
     # Reorder the dataframe columns
     input_df = input_df[columns_order]
@@ -51,16 +54,9 @@ def make_predictions(input_df):
     dmatrix = xgb.DMatrix(input_df)
     
     # Predict using the XGBoost model
-    total_contact_preds = model.predict(dmatrix)
-    web_user_preds = model.predict(dmatrix)
+    predictions = model.predict(dmatrix)
     
-    # Create a DataFrame for predictions with months as columns
-    predictions = pd.DataFrame({
-        month: [np.round(total_contact_preds[i], 2), np.round(web_user_preds[i], 2)] 
-        for i, month in enumerate(months)
-    }, index=['TotalContact', 'WebUsers'])
-    
-        # Extract predictions and organize them
+    # Extract predictions and organize them
     total_contact_preds = [np.round(pred[0], 2) for pred in predictions]  # First value of the tuple is TotalContact
     web_user_preds = [np.round(pred[1], 2) for pred in predictions]       # Second value of the tuple is WebUsers
     
