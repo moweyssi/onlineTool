@@ -37,6 +37,7 @@ def make_predictions(df):
             # First row is already fully filled, just predict
             st.write(df.iloc[[i]])
             prediction = model.predict(df.iloc[[i]])[0]
+            predictions.append(prediction)
         else:
             # Check if the previous row exists (avoid KeyError)
             if i - 1 >= 0:
@@ -56,11 +57,11 @@ def make_predictions(df):
                     else:
                         st.error(f"Column {month_col} does not exist in DataFrame")
             
-            # Make prediction for the current row
-            st.write(df.iloc[[i]])
-            prediction = model.predict(df.iloc[[i]])[0]
+                # Make prediction for the current row
+                st.write(df.iloc[[i]])
+                prediction = model.predict(df.iloc[[i]])[0]
         
-        predictions.append(prediction)
+                predictions.append(prediction)
 
     # Convert predictions into a DataFrame with columns for 'WebUsers' and 'Contacts'
     predictions_df = pd.DataFrame(predictions, columns=['WebUsers', 'Contacts'], index=df.index)
