@@ -1,80 +1,54 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import xgboost as xgb
+import joblib
 import plotly.graph_objects as go
+from sklearn.ensemble import RandomForestRegressor
 
-# Load the trained XGBoost model
-model = xgb.Booster({'nthread': 4})  # init model
-model.load_model('R2_0.41_MAE_646.json')  # load the pre-trained model
+# Load the trained RandomForest model
+model = joblib.load('R0.75_MAE_235.joblib')
 
 # Define months of interest
 months = ['September', 'October', 'November', 'December', 'January', 'February', 'March']
 
 # Define marketing channels (renaming "Undirected" for display)
-channels = ['PaidSocial', 'PaidSearch', 'DirectMail', 'Undirected(radio_outofhome_print)']
+channels = ['PaidSocial', 'PaidSearch', 'DirectMail', 'Radio', 'OutOfHome', 'Print']
 
-# Updated predefined values for "under-the-hood" columns
-web_users_may = 345
-web_users_june = 1116
-web_users_july = 1061
-contact_may = 34
-contact_june = 110
-contact_july = 133
-
-# The model needs columns in the following order: 
-# ['MonthsRunning', 'MonthNumber', 'WebUsersMay', 'WebUsersJune', 'WebUsersJuly', 'ContactMay', 
-#  'ContactJune', 'ContactJuly', 'PaidSocial', 'PaidSearch', 'DirectMail', 'Undirected']
-
-# Pre-populated data (in the transposed format)
+# Pre-populated data for marketing spend
 prepopulated_data = {
-    'September': [3850.33, 6882.34, 0, 3938.75],
-    'October': [3850.33, 6882.34, 22500, 3938.75],
-    'November': [3850.33, 6882.34, 22500, 3938.75],
-    'December': [3850.33, 2000, 0, 3938.75],
-    'January': [3850.33, 2000, 0, 3938.75],
-    'February': [3850.33, 2000, 0, 0],
-    'March': [0, 0, 0, 0]
+    'September': [3850.33, 6882.34, 0, 3938.75, 0, 0],
+    'October': [3850.33, 6882.34, 22500, 3938.75, 0, 0],
+    'November': [3850.33, 6882.34, 22500, 3938.75, 0, 0],
+    'December': [3850.33, 2000, 0, 3938.75, 0, 0],
+    'January': [3850.33, 2000, 0, 3938.75, 0, 0],
+    'February': [3850.33, 2000, 0, 0, 0, 0],
+    'March': [0, 0, 0, 0, 0, 0]
 }
 
-# Function to make predictions based on the input DataFrame
-def make_predictions(input_df):
-    # Add the predefined columns to the input dataframe
-    input_df['WebUsersMay'] = web_users_may
-    input_df['WebUsersJune'] = web_users_june
-    input_df['WebUsersJuly'] = web_users_july
-    input_df['ContactMay'] = contact_may
-    input_df['ContactJune'] = contact_june
-    input_df['ContactJuly'] = contact_july
-    
-    # Add 'MonthsRunning' and 'MonthNumber'
-    input_df['MonthsRunning'] = np.arange(1, len(months) + 1)  # Example: 1, 2, 3, ...
-    input_df['MonthNumber'] = np.arange(5, 5 + len(months))     # Example: 5, 6, 7, ... (starting from May)
-    
-    # Reorder columns to match the model's requirements
-    columns_order = ['MonthsRunning', 'MonthNumber', 'WebUsersMay', 'WebUsersJune', 'WebUsersJuly', 
-                     'ContactMay', 'ContactJune', 'ContactJuly', 'PaidSocial', 'PaidSearch', 
-                     'DirectMail', 'Undirected(radio_outofhome_print)']
-    
+# Function to make predictions based on sequential input
+def make_predictions(df):
+    # Initialize the first row's complete input data
+    predictions = []
+    for i in range(len(df)):
+        if i == 0:
+            # First row is already fully filled, just predict
+            prediction = model.predict(df.iloc[[i]])[0]
+        else:
+            # Fill in 'MonthBefore' data with the predictions from the previous row
+            df.loc[i, 'WebUsersMonthBefore'] = predictions[-1][0]  # Use WebUsers from previous prediction
+            df.loc[i, 'ContactsMonthBefore'] = predictions[-1][1]  # Use Contacts from previous prediction
+            
+            # Fill in the remaining 'MonthBefore' marketing spend data from the previous row in the dataframe
+            for col in ['PaidSocial', 'PaidSearch', 'DirectMail', 'Radio', 'OutOfHome', 'Print']:
+                df.loc[i, f'{col}MonthBefore'] = df.loc[i - 1, col]
+            
+            # Make prediction for the current row
+            prediction = model.predict(df.iloc[[i]])[0]
+        
+        predictions.append(prediction)
 
-    # Reorder the dataframe columns
-    input_df = input_df[columns_order]
-    
-    # Convert DataFrame to DMatrix for XGBoost prediction
-    dmatrix = xgb.DMatrix(input_df)
-    
-    # Predict using the XGBoost model
-    predictions = model.predict(dmatrix)
-    
-    # Extract predictions and organize them
-    total_contact_preds = [np.round(pred[0], 0) for pred in predictions]  # First value of the tuple is TotalContact
-    web_user_preds = [np.round(pred[1], 0) for pred in predictions]       # Second value of the tuple is WebUsers
-    
-    # Create a DataFrame for predictions with months as columns
-    predictions_df = pd.DataFrame({
-        month: [total_contact_preds[i], web_user_preds[i]] 
-        for i, month in enumerate(months)
-    }, index=['TotalContact', 'WebUsers'])
+    # Extract predictions into a DataFrame
+    predictions_df = pd.DataFrame(predictions, columns=['WebUsers', 'Contacts'], index=df.index)
     
     return predictions_df
 
@@ -82,7 +56,33 @@ def make_predictions(input_df):
 st.title('Marketing Spend Prediction')
 
 # Pre-populated DataFrame with input data (transposed format)
-input_data = pd.DataFrame(prepopulated_data, index=channels)
+input_data = pd.DataFrame(prepopulated_data, index=channels).T
+
+# Define the structure of the DataFrame required for the model
+def create_initial_dataframe(input_data):
+    df = pd.DataFrame({
+        'MonthsRunning': [5, 6, 7, 8, 9, 10, 11],
+        'MonthNumber': [9, 10, 11, 12, 1, 2, 3],
+        'PaidSocial': input_data['PaidSocial'],
+        'PaidSearch': input_data['PaidSearch'],
+        'DirectMail': input_data['DirectMail'],
+        'Radio': input_data['Radio'],
+        'OutOfHome': input_data['OutOfHome'],
+        'Print': input_data['Print'],
+        # Fill with the first row's full data; others will be filled sequentially
+        'WebUsersMonthBefore': [2589] + [np.nan] * 6,
+        'ContactsMonthBefore': [22] + [np.nan] * 6,
+        'PaidSocialMonthBefore': [5008.15] + [np.nan] * 6,
+        'PaidSearchMonthBefore': [6017.84] + [np.nan] * 6,
+        'DirectMailMonthBefore': [0] + [np.nan] * 6,
+        'RadioMonthBefore': [3938.75] + [np.nan] * 6,
+        'OutOfHomeMonthBefore': [0] + [np.nan] * 6,
+        'PrintMonthBefore': [0] + [np.nan] * 6
+    })
+    return df
+
+# Create initial dataframe with missing values
+initial_df = create_initial_dataframe(input_data)
 
 # Display the editable input DataFrame
 st.subheader("Input Marketing Spend for Each Channel (Rows) and Month (Columns)")
@@ -90,63 +90,56 @@ input_df = st.data_editor(input_data, use_container_width=True)
 
 # Generate predictions when inputs are changed
 if st.button('Generate Predictions'):
-    # Transpose the input to align with model's expected input format
-    input_df = input_df.T
-    
     # Call the prediction function
-    predictions = make_predictions(input_df)
+    predictions = make_predictions(initial_df)
     
     # Display the output as a non-editable DataFrame
-    st.subheader("Predicted TotalContact and WebUsers (Rows) for Each Month (Columns)")
+    st.subheader("Predicted WebUsers and Contacts for Each Month")
     st.dataframe(predictions, use_container_width=True)
 
+# Feature importance visualization (if your RandomForest model supports it)
+if hasattr(model, 'feature_importances_'):
+    rf_importances = model.feature_importances_
 
+    # Get feature names
+    feature_names = ['MonthsRunning', 'MonthNumber', 'PaidSocial', 'PaidSearch', 'DirectMail',
+                     'Radio', 'OutOfHome', 'Print', 'WebUsersMonthBefore', 'ContactsMonthBefore',
+                     'PaidSocialMonthBefore', 'PaidSearchMonthBefore', 'DirectMailMonthBefore',
+                     'RadioMonthBefore', 'OutOfHomeMonthBefore', 'PrintMonthBefore']
 
+    # Convert to DataFrame for easier manipulation
+    feature_importance_df = pd.DataFrame({
+        'Feature': feature_names,
+        'Importance': rf_importances
+    })
 
-# Assuming the feature importances are calculated like this
-xg_importances = model.get_score(importance_type='weight')  # Get feature importances from XGBoost
+    # Sort feature importances by descending order
+    feature_importance_df = feature_importance_df.sort_values(by='Importance', ascending=False)
 
-# Get feature names
-feature_names = ['MonthsRunning', 'MonthNumber', 'WebUsersMay', 'WebUsersJune', 'WebUsersJuly', 
-                 'ContactMay', 'ContactJune', 'ContactJuly', 'PaidSocial', 'PaidSearch', 
-                 'DirectMail', 'Undirected(radio_outofhome_print)']
+    # Add explanation about feature importances
+    with st.expander("See explanation"):
+        st.write("""
+            **Feature Importance Explanation:**
 
-# Convert to DataFrame for easier manipulation
-feature_importance_df = pd.DataFrame({
-    'Feature': feature_names,
-    'Importance': [xg_importances.get(f, 0) for f in feature_names]  # Using 0 if feature is not in the importance dict
-})
+            Feature importance reflects how much each feature contributed to the model's predictions. 
+            Features with higher importance values have more influence on the predictions made by the model.
+        """)
 
-# Sort feature importances by descending order
-feature_importance_df = feature_importance_df.sort_values(by='Importance', ascending=False)
+        # Create a Plotly bar chart for feature importances
+        fig = go.Figure(data=[go.Bar(
+            x=feature_importance_df['Feature'],
+            y=feature_importance_df['Importance'],
+            marker_color='indianred'
+        )])
 
-# Add explanation about feature importances
-with st.expander("See explanation"):
-    st.write("""
-        **Feature Importance Explanation:**
+        fig.update_layout(
+            title="Feature Importances",
+            xaxis_title="Features",
+            yaxis_title="Importance",
+            xaxis_tickangle=-45,
+            template="plotly_white",
+            height=600
+        )
 
-        Feature importance reflects how much each feature contributed to the model's predictions. 
-        Features with higher importance values have more influence on the predictions made by the model.
-
-        The bar chart below shows the relative importance of each feature in the XGBoost model. 
-        These values can help identify the key factors driving the model's behavior.
-    """)
-
-    # Create a Plotly bar chart for feature importances
-    fig = go.Figure(data=[go.Bar(
-        x=feature_importance_df['Feature'],
-        y=feature_importance_df['Importance'],
-        marker_color='indianred'
-    )])
-
-    fig.update_layout(
-        title="Feature Importances",
-        xaxis_title="Features",
-        yaxis_title="Importance",
-        xaxis_tickangle=-45,
-        template="plotly_white",
-        height=600
-    )
-
-    # Display the plot
-    st.plotly_chart(fig, use_container_width=True)
+        # Display the plot
+        st.plotly_chart(fig, use_container_width=True)
