@@ -85,7 +85,7 @@ def create_initial_dataframe(input_data):
         'OutOfHomeMonthBefore': [0] + [np.nan] * 6,
         'PrintMonthBefore': [0] + [np.nan] * 6
     })
-    return df.round(0)
+    return df.style.format("{:.0%}")
 
 # Create initial dataframe with missing values
 initial_df = create_initial_dataframe(input_data)
