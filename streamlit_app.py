@@ -31,10 +31,7 @@ def make_predictions(df):
     predictions = []
     
     for month in df.index:
-
-
         i = df.index.get_loc(month)  # Get the numerical index of the current month
-        
         if i == 0:
             # First row is already fully filled, just predict
             prediction = model.predict(df.loc[[month]])[0]
@@ -53,7 +50,6 @@ def make_predictions(df):
                     df.loc[month, month_col] = df.loc[previous_month, col]  # Fill with the previous month's spend
             
             # Make prediction for the current month
-            st.write("DataFrame before prediction:")
             prediction = model.predict(df.loc[[month]])[0]
             predictions.append(prediction)
 
