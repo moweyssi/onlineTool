@@ -32,10 +32,10 @@ def make_predictions(df):
     
     for i in range(len(df)):
         st.write(f"Processing row: {i}")  # Debug statement
-        st.write(df.iloc[[i]])  # Debug statement
         
         if i == 0:
             # First row is already fully filled, just predict
+            st.write(df.iloc[[i]])
             prediction = model.predict(df.iloc[[i]])[0]
         else:
             # Check if the previous row exists (avoid KeyError)
@@ -57,6 +57,7 @@ def make_predictions(df):
                         st.error(f"Column {month_col} does not exist in DataFrame")
             
             # Make prediction for the current row
+            st.write(df.iloc[[i]])
             prediction = model.predict(df.iloc[[i]])[0]
         
         predictions.append(prediction)
