@@ -32,6 +32,7 @@ def make_predictions(df):
     
     for i in range(len(df)):
         st.write(f"Processing row: {i}")  # Debug statement
+        st.write(df.iloc[[i]])  # Debug statement
         
         if i == 0:
             # First row is already fully filled, just predict
