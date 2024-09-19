@@ -5,7 +5,7 @@ import xgboost as xgb
 
 # Load the trained XGBoost model
 model = xgb.Booster({'nthread': 4})  # init model
-model.load_model('R2_0.32_MAE_800.json')  # load the pre-trained model
+model.load_model('R2_0.41_MAE_646.json')  # load the pre-trained model
 
 # Define months of interest
 months = ['September', 'October', 'November', 'December', 'January', 'February', 'March']
