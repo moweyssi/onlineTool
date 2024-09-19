@@ -1,12 +1,14 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import joblib
+import pickle
 import plotly.graph_objects as go
 from sklearn.ensemble import RandomForestRegressor
 
 # Load the trained RandomForest model
-model = joblib.load('R0.75_MAE_235.joblib')
+with open("rfr_newmodel.pkl","wb") as file:
+    model = pickle.load(file)
+
 
 # Define months of interest
 months = ['September', 'October', 'November', 'December', 'January', 'February', 'March']
