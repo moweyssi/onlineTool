@@ -28,7 +28,7 @@ prepopulated_data = {
 
 # Function to make predictions based on sequential input
 def make_predictions(df):
-    df=df.T
+    df=df
     predictions = []
     
     for month in df.index:
@@ -87,13 +87,13 @@ def create_initial_dataframe(input_data):
         'PrintMonthBefore': [0] + [np.nan] * 6
     })
     return df
-# Create initial dataframe with missing values
-initial_df = create_initial_dataframe(input_data)
+
 
 # Display the editable input DataFrame (transposed)
 st.subheader("Input Marketing Spend for Each Channel (Rows) and Month (Columns)")
 input_df = st.data_editor(input_data.T, use_container_width=True)
-
+# Create initial dataframe with missing values
+initial_df = create_initial_dataframe(input_df.T)
 # Generate predictions when inputs are changed
 if st.button('Generate Predictions'):
     # Call the prediction function
