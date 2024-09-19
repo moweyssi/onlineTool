@@ -47,6 +47,7 @@ input_df_viz = st.data_editor(input_data, use_container_width=True)
 # Generate predictions when inputs are changed
 if st.button('Generate Predictions'):
     input_data_calc = input_df_viz
+    st.text(input_data_calc)
     input_data_calc.append(['MonthsRunning',5,6,7,8,9,10,11])
     st.dataframe(input_data_calc)
     # Call the prediction function
