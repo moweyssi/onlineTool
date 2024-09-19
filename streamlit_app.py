@@ -17,12 +17,12 @@ channels = ['PaidSocial', 'PaidSearch', 'DirectMail', 'Radio', 'OutOfHome', 'Pri
 
 # Pre-populated data for marketing spend
 prepopulated_data = {
-    'September': [3850.33, 6882.34, 0, 3938.75, 0, 0],
-    'October': [3850.33, 6882.34, 22500, 3938.75, 0, 0],
-    'November': [3850.33, 6882.34, 22500, 3938.75, 0, 0],
-    'December': [3850.33, 2000, 0, 3938.75, 0, 0],
-    'January': [3850.33, 2000, 0, 3938.75, 0, 0],
-    'February': [3850.33, 2000, 0, 0, 0, 0],
+    'September': [3850, 6882, 0, 3938, 0, 0],
+    'October': [3850, 6882, 22500, 3938, 0, 0],
+    'November': [3850, 6882, 22500, 3938, 0, 0],
+    'December': [3850, 2000, 0, 3938, 0, 0],
+    'January': [3850, 2000, 0, 3938, 0, 0],
+    'February': [3850, 2000, 0, 0, 0, 0],
     'March': [0, 0, 0, 0, 0, 0]
 }
 
