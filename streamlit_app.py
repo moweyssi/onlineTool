@@ -99,7 +99,6 @@ def create_initial_dataframe(input_data):
 
 # Create initial dataframe with missing values
 initial_df = create_initial_dataframe(input_data)
-st.dataframe(initial_df)
 
 # Display the editable input DataFrame (transposed)
 st.subheader("Input Marketing Spend for Each Channel (Rows) and Month (Columns)")
