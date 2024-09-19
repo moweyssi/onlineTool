@@ -31,15 +31,12 @@ def make_predictions(df):
     predictions = []
     
     for month in df.index:
-        st.write(f"Processing month: {month}")  # Debug statement
-        st.write("Current DataFrame before prediction:")
-        st.write(df)  # Print the current DataFrame for debugging
+
 
         i = df.index.get_loc(month)  # Get the numerical index of the current month
         
         if i == 0:
             # First row is already fully filled, just predict
-            st.write(df.loc[month])  # Access using month
             prediction = model.predict(df.loc[[month]])[0]
             predictions.append(prediction)
         else:
@@ -57,7 +54,6 @@ def make_predictions(df):
             
             # Make prediction for the current month
             st.write("DataFrame before prediction:")
-            st.write(df.loc[[month]])  # Access using month
             prediction = model.predict(df.loc[[month]])[0]
             predictions.append(prediction)
 
