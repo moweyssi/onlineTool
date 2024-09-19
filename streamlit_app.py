@@ -13,7 +13,7 @@ months = ['September', 'October', 'November', 'December', 'January', 'February',
 
 # Define marketing channels
 channels = ['PaidSocial', 'PaidSearch', 'DirectMail', 'Undirected']
-MonthsRunning	MonthNumber	WebUsersMay	WebUsersJune	WebUsersJuly	ContactMay	ContactJune	ContactJuly	PaidSocial	PaidSearch	DirectMail	Undirected(radio_outofhome_print)
+#MonthsRunning	MonthNumber	WebUsersMay	WebUsersJune	WebUsersJuly	ContactMay	ContactJune	ContactJuly	PaidSocial	PaidSearch	DirectMail	Undirected(radio_outofhome_print)
 
 # Function to make predictions based on the input DataFrame
 def make_predictions(input_df):
