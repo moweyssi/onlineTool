@@ -57,7 +57,7 @@ def make_predictions(df):
     # Convert predictions into a DataFrame with columns for 'WebUsers' and 'Contacts'
     predictions_df = pd.DataFrame(predictions, columns=['WebUsers', 'Contacts'], index=df.index)
     
-    return predictions_df.style.format("{:.0f}")
+    return predictions_df.T.style.format("{:.0f}")
 
 # Initialize the app
 st.title('Marketing Spend Prediction')
@@ -101,7 +101,7 @@ if st.button('Generate Predictions'):
     
     # Display the output as a non-editable DataFrame
     st.subheader("Predicted WebUsers and Contacts for Each Month")
-    st.dataframe(predictions.T, use_container_width=True)
+    st.dataframe(predictions, use_container_width=True)
 
 # Feature importance visualization (if your RandomForest model supports it)
 if hasattr(model, 'feature_importances_'):
