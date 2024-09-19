@@ -6,9 +6,8 @@ import plotly.graph_objects as go
 from sklearn.ensemble import RandomForestRegressor
 
 # Load the trained RandomForest model
-with open("rfr_newmodel.pkl","rb") as file:
+with open("rfr_newmodel.pkl", "rb") as file:
     model = pickle.load(file)
-
 
 # Define months of interest
 months = ['September', 'October', 'November', 'December', 'January', 'February', 'March']
@@ -29,8 +28,8 @@ prepopulated_data = {
 
 # Function to make predictions based on sequential input
 def make_predictions(df):
-    # Initialize the first row's complete input data
     predictions = []
+    
     for i in range(len(df)):
         if i == 0:
             # First row is already fully filled, just predict
@@ -49,7 +48,7 @@ def make_predictions(df):
         
         predictions.append(prediction)
 
-    # Extract predictions into a DataFrame
+    # Convert predictions into a DataFrame with columns for 'WebUsers' and 'Contacts'
     predictions_df = pd.DataFrame(predictions, columns=['WebUsers', 'Contacts'], index=df.index)
     
     return predictions_df
@@ -86,7 +85,7 @@ def create_initial_dataframe(input_data):
 # Create initial dataframe with missing values
 initial_df = create_initial_dataframe(input_data)
 
-# Display the editable input DataFrame
+# Display the editable input DataFrame (transposed)
 st.subheader("Input Marketing Spend for Each Channel (Rows) and Month (Columns)")
 input_df = st.data_editor(input_data, use_container_width=True)
 
