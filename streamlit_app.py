@@ -79,7 +79,7 @@ st.subheader("Input Marketing Spend for Each Channel (Rows) and Month (Columns)"
 
 input_df = st.data_editor(input_data, use_container_width=True)
 total_df = pd.DataFrame({
-    "Total":input_data.sum(numeric_only=True, axis=0)
+    "Total":input_df.sum(numeric_only=True, axis=0)
 })
 st.dataframe(total_df.T)
 # Generate predictions when inputs are changed
