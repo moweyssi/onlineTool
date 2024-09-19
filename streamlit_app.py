@@ -27,6 +27,7 @@ contact_july = 55
 
 # Function to make predictions based on the input DataFrame
 def make_predictions(input_df):
+    input_df.drop("Total")
     # Add the predefined columns to the input dataframe
     input_df['WebUsersMay'] = web_users_may
     input_df['WebUsersJune'] = web_users_june
@@ -77,7 +78,7 @@ input_data = pd.DataFrame({
 # Display the editable input DataFrame
 st.subheader("Input Marketing Spend for Each Channel (Rows) and Month (Columns)")
 input_df = st.data_editor(input_data, use_container_width=True)
-
+input_df.loc["Total"] = input_df.sum()
 # Generate predictions when inputs are changed
 if st.button('Generate Predictions'):
     # Transpose the input to align with model's expected input format
