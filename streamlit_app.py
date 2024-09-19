@@ -37,6 +37,7 @@ def make_predictions(df):
         if i == 0:
             # First row is already fully filled, just predict
             prediction = model.predict(df.iloc[[i]])[0]
+            st.write(prediction)
         else:
             # Check if the previous row exists (avoid KeyError)
             if i - 1 >= 0:
