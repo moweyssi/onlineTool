@@ -60,7 +60,17 @@ def make_predictions(input_df):
         for i, month in enumerate(months)
     }, index=['TotalContact', 'WebUsers'])
     
-    return predictions
+        # Extract predictions and organize them
+    total_contact_preds = [np.round(pred[0], 2) for pred in predictions]  # First value of the tuple is TotalContact
+    web_user_preds = [np.round(pred[1], 2) for pred in predictions]       # Second value of the tuple is WebUsers
+    
+    # Create a DataFrame for predictions with months as columns
+    predictions_df = pd.DataFrame({
+        month: [total_contact_preds[i], web_user_preds[i]] 
+        for i, month in enumerate(months)
+    }, index=['TotalContact', 'WebUsers'])
+    
+    return predictions_df
 
 # Initialize the app
 st.title('Marketing Spend Prediction')
