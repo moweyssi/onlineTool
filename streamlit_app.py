@@ -30,44 +30,41 @@ prepopulated_data = {
 def make_predictions(df):
     predictions = []
     
-    for i in range(len(df)):
-        st.write(f"Processing row: {i}")  # Debug statement
+    for month in df.index:
+        st.write(f"Processing month: {month}")  # Debug statement
         st.write("Current DataFrame before prediction:")
         st.write(df)  # Print the current DataFrame for debugging
+
+        i = df.index.get_loc(month)  # Get the numerical index of the current month
         
         if i == 0:
             # First row is already fully filled, just predict
-            st.write(df.iloc[[i]])
-            prediction = model.predict(df.iloc[[i]])[0]
+            st.write(df.loc[month])  # Access using month
+            prediction = model.predict(df.loc[[month]])[0]
             predictions.append(prediction)
         else:
-            # Fill in 'MonthBefore' data with the predictions from the previous row
+            # Fill in 'MonthBefore' data with the predictions from the previous month
             if predictions:  # Ensure there's a previous prediction to use
-                df.loc[i, 'WebUsersMonthBefore'] = predictions[-1][0]
-                df.loc[i, 'ContactsMonthBefore'] = predictions[-1][1]
+                df.loc[month, 'WebUsersMonthBefore'] = predictions[-1][0]
+                df.loc[month, 'ContactsMonthBefore'] = predictions[-1][1]
 
             # Ensure columns are being accessed safely
             for col in ['PaidSocial', 'PaidSearch', 'DirectMail', 'Radio', 'OutOfHome', 'Print']:
                 month_col = f'{col}MonthBefore'
                 if month_col in df.columns:
-                    if i - 1 in df.index:  # Ensure the previous index exists
-                        df.loc[i, month_col] = df.loc[i - 1, col]
-                    else:
-                        st.error(f"Index {i - 1} does not exist in DataFrame")
-                else:
-                    st.error(f"Column {month_col} does not exist in DataFrame")
+                    previous_month = df.index[i - 1]  # Get the previous month
+                    df.loc[month, month_col] = df.loc[previous_month, col]  # Fill with the previous month's spend
             
-            # Make prediction for the current row
+            # Make prediction for the current month
             st.write("DataFrame before prediction:")
-            st.write(df.iloc[[i]])
-            prediction = model.predict(df.iloc[[i]])[0]
+            st.write(df.loc[[month]])  # Access using month
+            prediction = model.predict(df.loc[[month]])[0]
             predictions.append(prediction)
 
     # Convert predictions into a DataFrame with columns for 'WebUsers' and 'Contacts'
     predictions_df = pd.DataFrame(predictions, columns=['WebUsers', 'Contacts'], index=df.index)
     
     return predictions_df
-
 
 # Initialize the app
 st.title('Marketing Spend Prediction')
