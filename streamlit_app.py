@@ -11,7 +11,7 @@ model.load_model('R2_0.32_MAE_800.json')  # load the pre-trained model
 months = ['September', 'October', 'November', 'December', 'January', 'February', 'March']
 
 # Define marketing channels
-channels = ['PaidSocial', 'PaidSearch', 'DirectMail', 'Undirected']
+channels = ['PaidSocial', 'PaidSearch', 'DirectMail', 'Undirected(radio_outofhome_print)']
 
 # Pre-defined values for "under-the-hood" columns
 web_users_may = 1000
@@ -23,7 +23,7 @@ contact_july = 55
 
 # The model needs columns in the following order: 
 # ['MonthsRunning', 'MonthNumber', 'WebUsersMay', 'WebUsersJune', 'WebUsersJuly', 'ContactMay', 
-#  'ContactJune', 'ContactJuly', 'PaidSocial', 'PaidSearch', 'DirectMail', 'Undirected']
+#  'ContactJune', 'ContactJuly', 'PaidSocial', 'PaidSearch', 'DirectMail', 'Undirected(radio_outofhome_print)']
 
 # Function to make predictions based on the input DataFrame
 def make_predictions(input_df):
@@ -42,7 +42,7 @@ def make_predictions(input_df):
     # Reorder columns to match the model's requirements
     columns_order = ['MonthsRunning', 'MonthNumber', 'WebUsersMay', 'WebUsersJune', 'WebUsersJuly', 
                      'ContactMay', 'ContactJune', 'ContactJuly', 'PaidSocial', 'PaidSearch', 
-                     'DirectMail', 'Undirected']
+                     'DirectMail', 'Undirected(radio_outofhome_print)']
     
     # Reorder the dataframe columns
     input_df = input_df[columns_order]
