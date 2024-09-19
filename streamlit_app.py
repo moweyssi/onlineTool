@@ -78,7 +78,7 @@ input_data = pd.DataFrame({
 # Display the editable input DataFrame
 st.subheader("Input Marketing Spend for Each Channel (Rows) and Month (Columns)")
 input_df = st.data_editor(input_data, use_container_width=True)
-input_df.loc["Total"] = input_df.sum()
+input_df.loc['Column_Total']= input_df.sum(numeric_only=True, axis=0)
 # Generate predictions when inputs are changed
 if st.button('Generate Predictions'):
     # Transpose the input to align with model's expected input format
