@@ -31,6 +31,8 @@ def make_predictions(df):
     predictions = []
     
     for i in range(len(df)):
+        st.write(f"Processing row: {i}")  # Debug statement
+        
         if i == 0:
             # First row is already fully filled, just predict
             prediction = model.predict(df.iloc[[i]])[0]
@@ -38,15 +40,19 @@ def make_predictions(df):
             # Check if the previous row exists (avoid KeyError)
             if i - 1 >= 0:
                 # Fill in 'MonthBefore' data with the predictions from the previous row
-                df.loc[i, 'WebUsersMonthBefore'] = predictions[-1][0]  # Use WebUsers from previous prediction
-                df.loc[i, 'ContactsMonthBefore'] = predictions[-1][1]  # Use Contacts from previous prediction
+                df.loc[i, 'WebUsersMonthBefore'] = predictions[-1][0]
+                df.loc[i, 'ContactsMonthBefore'] = predictions[-1][1]
 
                 # Ensure columns are being accessed safely
                 for col in ['PaidSocial', 'PaidSearch', 'DirectMail', 'Radio', 'OutOfHome', 'Print']:
-                    if col in df.columns:
-                        df.loc[i, f'{col}MonthBefore'] = df.loc[i - 1, col]
+                    month_col = f'{col}MonthBefore'
+                    if month_col in df.columns:
+                        if i - 1 in df.index:  # Ensure the index exists
+                            df.loc[i, month_col] = df.loc[i - 1, col]
+                        else:
+                            st.error(f"Index {i - 1} does not exist in DataFrame")
                     else:
-                        st.error(f"Column {col}MonthBefore does not exist in DataFrame")
+                        st.error(f"Column {month_col} does not exist in DataFrame")
             
             # Make prediction for the current row
             prediction = model.predict(df.iloc[[i]])[0]
@@ -57,6 +63,10 @@ def make_predictions(df):
     predictions_df = pd.DataFrame(predictions, columns=['WebUsers', 'Contacts'], index=df.index)
     
     return predictions_df
+
+# Display the structure of initial_df before predictions
+st.write("Initial DataFrame structure:")
+
 
 # Initialize the app
 st.title('Marketing Spend Prediction')
@@ -89,6 +99,7 @@ def create_initial_dataframe(input_data):
 
 # Create initial dataframe with missing values
 initial_df = create_initial_dataframe(input_data)
+st.dataframe(initial_df)
 
 # Display the editable input DataFrame (transposed)
 st.subheader("Input Marketing Spend for Each Channel (Rows) and Month (Columns)")
