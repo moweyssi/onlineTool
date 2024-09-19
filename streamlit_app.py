@@ -77,7 +77,7 @@ def make_predictions(input_df):
 # Initialize the app
 st.title('Marketing Spend Prediction')
 
-input_data = pd.DataFrame(prepopulated_data, index=months)
+input_data = pd.DataFrame(prepopulated_data, index=channels)
 
 # Display the editable input DataFrame
 st.subheader("Input Marketing Spend for Each Channel (Rows) and Month (Columns)")
