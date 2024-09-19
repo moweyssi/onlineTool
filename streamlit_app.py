@@ -64,9 +64,6 @@ def make_predictions(df):
     
     return predictions_df
 
-# Display the structure of initial_df before predictions
-st.write("Initial DataFrame structure:")
-
 
 # Initialize the app
 st.title('Marketing Spend Prediction')
