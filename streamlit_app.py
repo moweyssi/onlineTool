@@ -57,7 +57,7 @@ def make_predictions(df):
 st.title('Marketing Spend Prediction')
 
 # Pre-populated DataFrame with input data (transposed format)
-input_data = pd.DataFrame(prepopulated_data, index=channels)
+input_data = pd.DataFrame(prepopulated_data, index=channels).T
 
 # Define the structure of the DataFrame required for the model
 def create_initial_dataframe(input_data):
