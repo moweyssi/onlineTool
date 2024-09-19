@@ -13,7 +13,9 @@ months = ['September', 'October', 'November', 'December', 'January', 'February',
 
 # Define marketing channels
 channels = ['PaidSocial', 'PaidSearch', 'DirectMail', 'Undirected']
-#MonthsRunning	MonthNumber	WebUsersMay	WebUsersJune	WebUsersJuly	ContactMay	ContactJune	ContactJuly	PaidSocial	PaidSearch	DirectMail	Undirected(radio_outofhome_print)
+
+#The model needs columns in the following order: 
+#MonthsRunning	MonthNumber	WebUsersMay	WebUsersJune	WebUsersJuly	ContactMay	ContactJune	ContactJuly	PaidSocial	PaidSearch	DirectMail	Undirected
 
 # Function to make predictions based on the input DataFrame
 def make_predictions(input_df):
@@ -42,15 +44,12 @@ input_data = pd.DataFrame({
 
 # Display the editable input DataFrame
 st.subheader("Input Marketing Spend for Each Channel (Rows) and Month (Columns)")
-input_df_viz = st.data_editor(input_data, use_container_width=True)
+input_df = st.data_editor(input_data, use_container_width=True)
 
 # Generate predictions when inputs are changed
 if st.button('Generate Predictions'):
-    input_data_calc = input_df_viz
-    st.text(input_data_calc)
-    st.dataframe(input_data_calc)
     # Call the prediction function
-    predictions = make_predictions(input_data_calc)
+    predictions = make_predictions(input_df)
     
     # Display the output as a non-editable DataFrame
     st.subheader("Predicted TotalContact and WebUsers (Rows) for Each Month (Columns)")
