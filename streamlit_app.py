@@ -52,13 +52,14 @@ def make_predictions(df):
                     if month_col in df.columns:
                         if i - 1 in df.index:  # Ensure the index exists
                             df.loc[i, month_col] = df.loc[i - 1, col]
+                            st.write(df.iloc[[i]])
                         else:
                             st.error(f"Index {i - 1} does not exist in DataFrame")
                     else:
                         st.error(f"Column {month_col} does not exist in DataFrame")
             
                 # Make prediction for the current row
-                st.write(df.iloc[[i]])
+                
                 prediction = model.predict(df.iloc[[i]])[0]
         
                 predictions.append(prediction)
