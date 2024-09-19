@@ -13,25 +13,28 @@ months = ['September', 'October', 'November', 'December', 'January', 'February',
 # Define marketing channels (renaming "Undirected" for display)
 channels = ['PaidSocial', 'PaidSearch', 'DirectMail', 'Undirected(radio_outofhome_print)']
 
-# Pre-populated data for each month
-prepopulated_data = {
-    'PaidSocial': [3850.33, 3850.33, 3850.33, 3850.33, 3850.33, 3850.33, 0],
-    'PaidSearch': [6882.34, 6882.34, 6882.34, 2000, 2000, 2000, 0],
-    'DirectMail': [0, 22500, 22500, 0, 0, 0, 0],
-    'Undirected (radio, out-of-home, print)': [3938.75, 3938.75, 3938.75, 3938.75, 3938.75, 0, 0]
-}
-
 # Pre-defined values for "under-the-hood" columns
-web_users_may = 345
-web_users_june = 1116
-web_users_july = 1061
-contact_may = 34
-contact_june = 110
-contact_july = 133
+web_users_may = 1000
+web_users_june = 1100
+web_users_july = 1050
+contact_may = 50
+contact_june = 60
+contact_july = 55
 
 # The model needs columns in the following order: 
 # ['MonthsRunning', 'MonthNumber', 'WebUsersMay', 'WebUsersJune', 'WebUsersJuly', 'ContactMay', 
 #  'ContactJune', 'ContactJuly', 'PaidSocial', 'PaidSearch', 'DirectMail', 'Undirected']
+
+# Pre-populated data (in the transposed format)
+prepopulated_data = {
+    'September': [3850.33, 6882.34, 0, 3938.75],
+    'October': [3850.33, 6882.34, 22500, 3938.75],
+    'November': [3850.33, 6882.34, 22500, 3938.75],
+    'December': [3850.33, 2000, 0, 3938.75],
+    'January': [3850.33, 2000, 0, 3938.75],
+    'February': [3850.33, 2000, 0, 0],
+    'March': [0, 0, 0, 0]
+}
 
 # Function to make predictions based on the input DataFrame
 def make_predictions(input_df):
@@ -52,7 +55,7 @@ def make_predictions(input_df):
                      'ContactMay', 'ContactJune', 'ContactJuly', 'PaidSocial', 'PaidSearch', 
                      'DirectMail', 'Undirected(radio_outofhome_print)']
     
-    
+
     # Reorder the dataframe columns
     input_df = input_df[columns_order]
     
@@ -77,16 +80,13 @@ def make_predictions(input_df):
 # Initialize the app
 st.title('Marketing Spend Prediction')
 
+# Pre-populated DataFrame with input data (transposed format)
 input_data = pd.DataFrame(prepopulated_data, index=channels)
 
 # Display the editable input DataFrame
 st.subheader("Input Marketing Spend for Each Channel (Rows) and Month (Columns)")
-
 input_df = st.data_editor(input_data, use_container_width=True)
-total_df = pd.DataFrame({
-    "Total          ":input_df.sum(numeric_only=True, axis=0)
-})
-st.dataframe(total_df.T, use_container_width=True)
+
 # Generate predictions when inputs are changed
 if st.button('Generate Predictions'):
     # Transpose the input to align with model's expected input format
