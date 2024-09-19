@@ -13,13 +13,13 @@ months = ['September', 'October', 'November', 'December', 'January', 'February',
 # Define marketing channels (renaming "Undirected" for display)
 channels = ['PaidSocial', 'PaidSearch', 'DirectMail', 'Undirected(radio_outofhome_print)']
 
-# Pre-defined values for "under-the-hood" columns
-web_users_may = 1000
-web_users_june = 1100
-web_users_july = 1050
-contact_may = 50
-contact_june = 60
-contact_july = 55
+# Updated predefined values for "under-the-hood" columns
+web_users_may = 345
+web_users_june = 1116
+web_users_july = 1061
+contact_may = 34
+contact_june = 110
+contact_july = 133
 
 # The model needs columns in the following order: 
 # ['MonthsRunning', 'MonthNumber', 'WebUsersMay', 'WebUsersJune', 'WebUsersJuly', 'ContactMay', 
