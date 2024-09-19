@@ -56,7 +56,7 @@ def make_predictions(df):
     # Convert predictions into a DataFrame with columns for 'WebUsers' and 'Contacts'
     predictions_df = pd.DataFrame(predictions, columns=['WebUsers', 'Contacts'], index=df.index)
     
-    return predictions_df.style.format("{:.0}")
+    return predictions_df.style.format("int")
 
 # Initialize the app
 st.title('Marketing Spend Prediction')
