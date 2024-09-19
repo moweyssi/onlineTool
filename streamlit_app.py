@@ -35,13 +35,18 @@ def make_predictions(df):
             # First row is already fully filled, just predict
             prediction = model.predict(df.iloc[[i]])[0]
         else:
-            # Fill in 'MonthBefore' data with the predictions from the previous row
-            df.loc[i, 'WebUsersMonthBefore'] = predictions[-1][0]  # Use WebUsers from previous prediction
-            df.loc[i, 'ContactsMonthBefore'] = predictions[-1][1]  # Use Contacts from previous prediction
-            
-            # Fill in the remaining 'MonthBefore' marketing spend data from the previous row in the dataframe
-            for col in ['PaidSocial', 'PaidSearch', 'DirectMail', 'Radio', 'OutOfHome', 'Print']:
-                df.loc[i, f'{col}MonthBefore'] = df.loc[i - 1, col]
+            # Check if the previous row exists (avoid KeyError)
+            if i - 1 >= 0:
+                # Fill in 'MonthBefore' data with the predictions from the previous row
+                df.loc[i, 'WebUsersMonthBefore'] = predictions[-1][0]  # Use WebUsers from previous prediction
+                df.loc[i, 'ContactsMonthBefore'] = predictions[-1][1]  # Use Contacts from previous prediction
+
+                # Ensure columns are being accessed safely
+                for col in ['PaidSocial', 'PaidSearch', 'DirectMail', 'Radio', 'OutOfHome', 'Print']:
+                    if col in df.columns:
+                        df.loc[i, f'{col}MonthBefore'] = df.loc[i - 1, col]
+                    else:
+                        st.error(f"Column {col}MonthBefore does not exist in DataFrame")
             
             # Make prediction for the current row
             prediction = model.predict(df.iloc[[i]])[0]
