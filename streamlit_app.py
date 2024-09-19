@@ -2,22 +2,11 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import xgboost as xgb
-from sklearn.linear_model import LinearRegression  # Dummy model for example
 
-# Load or define the regression model
-# For demo purposes, using simple linear regression models
-# In reality, you would load a pre-trained model, e.g., with joblib or pickle.
-model_total_contact = LinearRegression()
-model_web_users = LinearRegression()
+model = xgb.Booster({'nthread': 4})  # init model
+model.load_model('R2_0.32_MAE_800.json')  # load data
 
-# Dummy training data (this would be replaced by your real model and dataset)
-X_train = np.random.rand(10, 4)  # Random marketing spends as features
-y_train_contact = np.random.rand(10) * 1000  # Random targets for TotalContact
-y_train_web = np.random.rand(10) * 500  # Random targets for WebUsers
 
-# Fit the models (replace with your pre-trained model)
-model_total_contact.fit(X_train, y_train_contact)
-model_web_users.fit(X_train, y_train_web)
 
 # Define months of interest
 months = ['September', 'October', 'November', 'December', 'January', 'February', 'March']
@@ -31,8 +20,8 @@ def make_predictions(input_df):
     input_features = input_df.T.values  # Shape (months, channels), needs to be (channels, months)
     
     # Predict using both models for each month (each row in input_features)
-    total_contact_preds = model_total_contact.predict(input_features)  # One prediction per month
-    web_user_preds = model_web_users.predict(input_features)  # One prediction per month
+    total_contact_preds = model.predict(input_features)  # One prediction per month
+    web_user_preds = model.predict(input_features)  # One prediction per month
     
     # Create a DataFrame for predictions with months as columns
     predictions = pd.DataFrame({
