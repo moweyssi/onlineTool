@@ -66,8 +66,8 @@ def make_predictions(input_df):
     predictions = model.predict(dmatrix)
     
     # Extract predictions and organize them
-    total_contact_preds = [np.round(pred[0], 2) for pred in predictions]  # First value of the tuple is TotalContact
-    web_user_preds = [np.round(pred[1], 2) for pred in predictions]       # Second value of the tuple is WebUsers
+    total_contact_preds = [np.round(pred[0], 0) for pred in predictions]  # First value of the tuple is TotalContact
+    web_user_preds = [np.round(pred[1], 0) for pred in predictions]       # Second value of the tuple is WebUsers
     
     # Create a DataFrame for predictions with months as columns
     predictions_df = pd.DataFrame({
