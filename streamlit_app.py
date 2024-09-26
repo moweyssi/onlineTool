@@ -55,7 +55,7 @@ def make_predictions(df):
             predictions.append(prediction)
 
     # Convert predictions into a DataFrame with columns for 'WebUsers' and 'Contacts'
-    predictions_df = pd.DataFrame(predictions, columns=['WebUsers', 'Contacts'], index=df.index)
+    predictions_df = pd.DataFrame(predictions, columns=['Contacts', 'WebUsers'], index=df.index)
     
     return predictions_df.T.style.format("{:.0f}")
 
