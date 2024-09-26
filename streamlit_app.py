@@ -6,7 +6,7 @@ import plotly.graph_objects as go
 from sklearn.ensemble import RandomForestRegressor
 #st.set_page_config(layout="wide")
 # Load the trained RandomForest model
-with open("rfr_newmodelR0.74_272.pkl", "rb") as file:
+with open("rfr_best_sofar.pkl", "rb") as file:
     model = pickle.load(file)
 
 # Define months of interest
@@ -78,7 +78,7 @@ def create_initial_dataframe(input_data):
         'Print': input_data['Print'],
         # Fill with the first row's full data; others will be filled sequentially
         'WebUsersMonthBefore': [2589] + [np.nan] * 6,
-        'ContactsMonthBefore': [22] + [np.nan] * 6,
+        'ContactsMonthBefore': [24] + [np.nan] * 6,
         'PaidSocialMonthBefore': [5008.15] + [np.nan] * 6,
         'PaidSearchMonthBefore': [6017.84] + [np.nan] * 6,
         'DirectMailMonthBefore': [0] + [np.nan] * 6,
